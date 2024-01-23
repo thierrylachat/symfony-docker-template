@@ -1,7 +1,14 @@
-FROM php:8.2-apache
+FROM composer AS vendor
+WORKDIR /var/www
+
+COPY composer.json .
+RUN composer install --ignore-platform-reqs --no-ansi --no-dev --no-interaction --no-progress --no-scripts --optimize-autoloader
+
+FROM php:8.3-apache
+WORKDIR /var/www
 
 # Installation de Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 # Installation des extensions PHP nécessaires pour Symfony
 RUN apt-get update \
@@ -14,7 +21,6 @@ RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
 RUN docker-php-ext-configure intl
 RUN docker-php-ext-install pdo pdo_mysql gd opcache intl zip calendar dom mbstring xsl
 RUN pecl install apcu imagick && docker-php-ext-enable apcu imagick
-
 
 # Configuration du serveur Apache
 COPY ./conf/apache.conf /etc/apache2/sites-available/apache.conf
@@ -35,7 +41,6 @@ RUN chown www-data /home/www-data/.zshrc
 USER www-data
 
 # Copie des fichiers de l'application Symfony
-WORKDIR /var/www
 COPY --chown=www-data:www-data . .
 
 # Exposition du port 80 pour Apache

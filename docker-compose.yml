@@ -8,8 +8,8 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:
-      DATABASE_URL: mysql://root:secret@database:3306/symfony_db?serverVersion=mariadb-10.9.4
-      APP_SECRET: changeMe
+      DATABASE_URL: mysql://user_tmdb:pass_tmdb@database:3306/tmdb_db?serverVersion=mariadb-10.9.4
+      APP_SECRET: pass_tmdb
       MAILER_DSN: smtp://:@mailcatcher:1025
       MESSENGER_TRANSPORT_DSN: doctrine://default
     ports:
@@ -23,12 +23,12 @@ services:
     image: mariadb:10.9.4
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: secret
-      MARIADB_DATABASE: symfony_db
+      MYSQL_ROOT_PASSWORD: root
+      MARIADB_DATABASE: tmdb_db
     ports:
       - "3306:3306"
     volumes:
-      - symfony_db_data:/var/lib/mysql
+      - tmdb_db_data:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin
@@ -36,7 +36,7 @@ services:
     environment:
       PMA_HOST: database
       PMA_USER: root
-      PMA_PASSWORD: secret
+      PMA_PASSWORD: root
     ports:
       - "8080:80"
     depends_on:
@@ -50,4 +50,4 @@ services:
       - "1025:1025"
 
 volumes:
-  symfony_db_data:
+  tmdb_db_data:
