@@ -14,7 +14,6 @@
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpmailer/phpmailer": "*",
         "phpstan/phpdoc-parser": "^1.15",
-        "sensio/framework-extra-bundle": "^6.1",
         "symfony/apache-pack": "^1.0",
         "symfony/asset": "6.4.*",
         "symfony/console": "6.4.*",
