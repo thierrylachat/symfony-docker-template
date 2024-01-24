@@ -1,9 +1,3 @@
-FROM composer AS vendor
-WORKDIR /var/www
-
-COPY composer.json .
-RUN composer install --ignore-platform-reqs --no-ansi --no-dev --no-interaction --no-progress --no-scripts --optimize-autoloader
-
 FROM php:8.3-apache
 WORKDIR /var/www
 
@@ -29,22 +23,30 @@ RUN a2dissite 000-default.conf \
     && a2enmod rewrite
 
 # Installation de ZSH et Starship prompt
-RUN apt-get install -y zsh;
-RUN chsh -s /bin/zsh;
-RUN curl -sS https://starship.rs/install.sh | sh -s -- -y
-RUN echo 'eval "$(starship init zsh)"' >> ~/.zshrc
+# RUN apt-get install -y zsh;
+# RUN chsh -s /bin/zsh;
+# RUN curl -sS https://starship.rs/install.sh | sh -s -- -y
+# RUN echo 'eval "$(starship init zsh)"' >> ~/.zshrc
 
+RUN chown -R www-data:www-data /var/www
 # Création d'un utilisateur Apache qui sera désigné comme utilisateur par défaut pour exécuter les commandes
 RUN userdel www-data && useradd -ms /bin/sh www-data
-RUN cp ~/.zshrc /home/www-data/.zshrc
-RUN chown www-data /home/www-data/.zshrc
+# RUN cp ~/.zshrc /home/www-data/.zshrc
+# RUN chown www-data /home/www-data/.zshrc
 USER www-data
 
+COPY ./composer.json ./composer.json
+COPY ./composer.lock ./composer.lock
+
 # Copie des fichiers de l'application Symfony
-COPY --chown=www-data:www-data . .
+COPY . .
 
 # Exposition du port 80 pour Apache
+RUN composer install --ignore-platform-reqs --no-ansi --no-dev --no-interaction --no-progress --no-scripts --optimize-autoloader
 EXPOSE 80
 
 # Démarrage d'Apache en arrière-plan
 CMD ["apache2-foreground"]
+
+# FROM composer AS vendor
+# WORKDIR /var/www
